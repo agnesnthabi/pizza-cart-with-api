@@ -1,0 +1,49 @@
+body{
+    background-color: #116271;
+    color: #fdfffc;
+}
+.container{
+    width: 80%;
+    margin: auto;
+}
+
+.pizza{
+    width: 15em;
+    margin: 0.5em;
+    padding: 0.3em;
+    border-radius: 0.25em;
+    display: inline-block;
+    background-color: #2ec4b6;
+    color:antiquewhite;
+}
+.btn{
+    color: aquamarine;
+    background-color: azure;
+    margin-top: 0.5em;
+    padding: 0.5em;
+    border-radius:0.5em;
+    float: right;
+}
+th, td{
+    border:0.5px solid #fdfffc;
+    padding: 0.5em;
+}
+table{
+    border-collapse: collapse;
+    width:100%;
+}
+.message{
+    padding: 1em;
+    color: black;
+}
+.cart{
+    display: flex;
+}
+.cart div{
+    flex: 1;
+}
+
+img{
+    width:100px;
+    height: 100px;
+}
