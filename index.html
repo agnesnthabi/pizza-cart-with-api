@@ -12,76 +12,168 @@
 
 <body x-data="pizzaCart">
     <div class="container">
-    <h1 x-text="title" ></h1>
-    <div class="cart">
-        <div>
+        <h1 x-text="title"></h1>
+
+        <div class="cart">
             <div>
-               Username: <input type="text" x-model="username">
-               <button x-on:click="login">Login</button>
-               <button x-on:click="logout" x-show="username && cartId" >Logout</button>
+                <div x-show="!isLoggedIn" class="login-page">
+                    <h1>Login</h1>
+                    Username: <input type="text" x-model="username">
+                    <button x-on:click="login">Login</button>
+                </div>
+                <div x-show="isLoggedIn" class="logout-page">
+                    <h1>Welcome, <span x-text="username"></span>!</h1>
+                    <button x-on:click="logout">Logout</button>
+                </div>
+                <div x-show="cartId">
+                    Cart code: <span x-text="cartId"></span>
+                </div>
             </div>
-          <div x-show="cartId">
-            Cart code: <span x-text="cartId" ></span>
-          </div>
-        </div>
-        <div  x-show="username && cartId">
-            <h2>Your Cart</h2>
-            <div class="message" x-text="message" >message here</div>
-            <table>
-                <tr>
-                 <th>Flavour</th>  
-                 <th>Size</th>   
-                 <th>Price</th>   
-                 <th>Qty</th>   
-                 <th>Total</th>    
-                </tr>
 
-                <template x-for="pizza in cartPizzas">
+            <div x-show="showHistoricalOrdersButton">
+                <button @click="toggleHistoricalOrders">Show Historical Orders</button>
+            </div>
+
+            <div x-show="showHistoricalOrders" class="historical-orders">
+                <h2>Historical Orders</h2>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order Date</th>
+                                <th>Pizzas</th>
+                                <th>Price</th>
+                                <th>Items</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <template x-for="order in historicalOrders">
+                                <tr>
+                                    <td>
+                                        
+                                            <li>
+                                                <span x-text="order.date"></span>
+                                            </li>
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            <template x-for="pizza in order.pizzas">
+                                                <li>
+                                                    <span x-text="pizza.flavour"></span>
+                                                </li>
+                                            </template>
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            <template x-for="pizza in order.pizzas">
+                                                <li>
+                                                    <span x-text="pizza.price"></span>
+                                                </li>
+                                            </template>
+                                        
+                                    </td>
+                                    <td>
+                                        
+                                            <template x-for="pizza in order.pizzas">
+                                                <li>
+                                                    <span x-text="pizza.qty"></span>
+                                                </li>
+                                            </template>
+                                        
+                                    </td>
+                                </tr>
+                            </template>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th>Total</th>
+                                <td>
+                                    <ul>
+                                        <template x-for="order in historicalOrders">
+                                            <li>
+                                                R<span x-text="order.total.toFixed(2)"></span>
+                                            </li>
+                                        </template>
+                                    </ul>
+                                </td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <div x-show="cartPizzas.length > 0">
+                <h2>Your Cart</h2>
+                <div class="message" x-text="message">message here</div>
+                <table>
                     <tr>
-                        <td x-text="pizza.flavour"></td>
-
-                        <td x-text="pizza.size"></td>
-                        <td x-text="pizza.price"></td>
-                        <td>
-                            <button x-on:click="addPizzaToCart(pizza.id)">+</button>
-                            x<span x-text="pizza.qty"></span>
-                            <button x-on:click="removePizzaFromCart(pizza.id)">-</button>
-                        </td>
-                        <td x-text="pizza.total"></td>
+                        <th>Flavour</th>
+                        <th>Size</th>
+                        <th>Price</th>
+                        <th>Qty</th>
+                        <th>Total</th>
                     </tr>
+                    <template x-for="pizza in cartPizzas">
+                        <tr>
+                            <td x-text="pizza.flavour"></td>
+                            <td x-text="pizza.size"></td>
+                            <td x-text="pizza.price"></td>
+                            <td>
+                                <button x-on:click="addPizzaToCart(pizza.id)">+</button>
+                                x<span x-text="pizza.qty"></span>
+                                <button x-on:click="removePizzaFromCart(pizza.id)">-</button>
+                            </td>
+                            <td x-text="pizza.total"></td>
+                        </tr>
+                    </template>
+                    <tr>
+                        <td colspan="3">Order Total</td>
+                        <td colspan="2">R <span x-text="cartTotal"></span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3">Checkout</td>
+                        <td>
+                            <input x-model="paymentAmount" type="text">
+                        </td>
+                        <td><button x-on:click="payForCart()">Pay</button></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="featured-pizzas">
+            <h2>Exclusive Pizza Deals</h2>
+            <div class="featured-pizza-grid">
+                <template x-for="pizza in featuredPizzas">
+                    <div class="pizza-card">
+                        <img src="pizza.webp" alt="small pizza">
+                        <div class="pizza-info">
+                            <h3 x-text="pizza.flavour"></h3>
+                            <p>Size: <span x-text="pizza.size"></span></p>
+                            <p>Price: R<span x-text="pizza.price"></span></p>
+                            <button x-on:click="addPizzaToCart(pizza.id)">Buy</button>
+                        </div>
+                    </div>
                 </template>
-                
-                <tr>
-                    <td colspan="3">Total</td>
-                    <td colspan="2">R <span x-text="cartTotal"></span></td>
-                </tr>
-                <tr>
-                    <td colspan="3">Pay now</td>
-                    <td>
-                        <input x-model="paymentAmount" type="text">
-                    </td>
-                    <td><button x-on:click="payForCart()">Pay</button></td>
-                </tr>
-            </table>
+            </div>
+        </div>
+
+        <div class="pizzas">
+            <h2>Pizzas</h2>
+            <template x-for="pizza in pizzas">
+                <div class="pizza">
+                    <strong><span x-text="pizza.size"></span></strong>
+                    <h5 x-text="pizza.flavour"></h5>
+                    <img src="C:\Users\Nthabiseng\Documents\projects\pizza-cart-with-api\pizza.webp" alt="pizza">
+                    <strong>R<span x-text="pizza.price"></span></strong>
+                    <div>
+                        <button class="btn" x-on:click="addPizzaToCart(pizza.id)">Add to cart</button>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
-
-    <div class="pizzas" x-show="username && cartId">
-        <h2>Pizzas</h2>
-        <template x-for="pizza in pizzas">
-        <div class="pizza">
-        <h5 x-text="pizza.flavour"></h5>
-        <img src="C:\Users\Nthabiseng\Documents\projects\pizza-cart-with-api\pizza.webp" alt="pizza" />
-        <span x-text="pizza.size"></span>
-        <strong>
-            R<span x-text="pizza.price"></span>
-        </strong>
-        <div>
-            <button class="btn" x-on:click="addPizzaToCart(pizza.id)">Add  to cart</button>
-        </div>
-      </div>
-    </template>
-    
-</div>
 </body>
 </html>
